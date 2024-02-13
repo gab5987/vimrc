@@ -26,14 +26,6 @@ require('lazy').setup({
     end
   },
 
-  -- {
-  --   'talha-akram/anvil',
-  --   lazy = false,
-  --   config = function ()
-  --     require('')
-  --   end
-  -- },
-
   {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -53,6 +45,10 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
     },
   },
+    {
+  'stevearc/conform.nvim',
+  opts = {},
+},
 
   {
     'akinsho/flutter-tools.nvim',
@@ -78,15 +74,6 @@ require('lazy').setup({
     ]]
     end
   },
-
-  -- {
-  --   'nvim-lualine/lualine.nvim',
-  --   opts = {
-  --     options = {
-  --       component_separators = '|',
-  --     },
-  --   },
-  -- },
 
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -127,7 +114,7 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 vim.cmd.set 'tabstop=2'
-vim.cmd.set 'shiftwidth=2'
+vim.cmd.set 'shiftwidth=4'
 vim.cmd.set 'expandtab'
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -158,6 +145,42 @@ vim.keymap.set('n', '<leader>/', function()
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
+local function format_dart_buffer()
+    vim.api.nvim_command('write')  -- Save the current buffer
+    local current_file = vim.fn.expand('%:p')  -- Get the full path of the current file
+    local format_command = 'dart format ' .. current_file  -- Construct the Dart format command
+
+    -- Run the format command in a terminal
+    vim.fn.termopen(format_command)
+end
+
+local function format_dart()
+    local filename = vim.fn.expand("%:p")
+    if string.match(filename, "%.dart$") then
+        local dart_format_command = "dart format '" .. filename .. "'"
+        os.execute(dart_format_command)
+    end
+end
+
+require("conform").setup({
+  formatters_by_ft = {
+    lua = { "stylua" },
+    dart = { "dart_format" },
+    rust = { "rustfmt" },
+  },
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function(args)
+    -- local filename = vim.fn.expand("%:p")
+    -- if string.match(filename, "%.dart$") then
+        require("conform").format({ bufnr = args.buf })
+    -- end
+  end,
+})
+
+-- vim.keymap.set('n', '<leader>fd', require("conform").format({ bufnr = args.buf }), { desc = '[F]ormat [D]art code' })
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
@@ -210,10 +233,10 @@ require('mason').setup()
 require('mason-lspconfig').setup()
 
 local servers = {
-  clangd = {},
+    clangd = {},
   -- gopls = {},
   -- pyright = {},
-  -- rust_analyzer = {},
+    rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
