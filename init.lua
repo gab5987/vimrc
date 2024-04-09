@@ -15,89 +15,83 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  'wakatime/vim-wakatime',
+    'wakatime/vim-wakatime',
 
-  {
-    'dasupradyumna/midnight.nvim',
-    lazy = false,
-    priority = 1000,
-    config = function()
-	    vim.cmd.colorscheme 'midnight'
-    end
-  },
-
-  {
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim', opts = {} },
-      'folke/neodev.nvim',
-    },
-  },
-
-  {
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'rafamadriz/friendly-snippets',
-    },
-  },
     {
-  'stevearc/conform.nvim',
-  opts = {},
-},
-
-  {
-    'akinsho/flutter-tools.nvim',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'stevearc/dressing.nvim',
+        'dasupradyumna/midnight.nvim', lazy = false, priority = 1000,
+        config = function() vim.cmd.colorscheme 'midnight' end
     },
-    config = function()
-      require("flutter-tools").setup {}
-    end
-  },
 
-  { 'folke/which-key.nvim',  opts = {} },
-
-  {
-    "rhysd/vim-clang-format",
-    config = function()
-      vim.cmd [[
-        augroup clang_autoformat
-            autocmd!
-            autocmd FileType c,cpp ClangFormatAutoEnable
-        augroup END
-    ]]
-    end
-  },
-
-  { 'numToStr/Comment.nvim', opts = {} },
-
-  {
-    'nvim-telescope/telescope.nvim',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
+    {
+        'neovim/nvim-lspconfig',
+        dependencies = {
+            'williamboman/mason.nvim',
+            'williamboman/mason-lspconfig.nvim',
+            { 'j-hui/fidget.nvim', opts = {} },
+            'folke/neodev.nvim'
+        }
     },
-  },
 
-  {
-    'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
+    {
+        'hrsh7th/nvim-cmp',
+        dependencies = {
+            'L3MON4D3/LuaSnip',
+            'saadparwaiz1/cmp_luasnip',
+            'hrsh7th/cmp-nvim-lsp',
+            'rafamadriz/friendly-snippets',
+        }
     },
-    build = ':TSUpdate',
-  },
+
+    { 'stevearc/conform.nvim', opts = {} },
+
+    {
+        'akinsho/flutter-tools.nvim',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'stevearc/dressing.nvim',
+        },
+        config = function()
+          require("flutter-tools").setup {}
+        end
+    },
+
+    { 'folke/which-key.nvim',  opts = {} },
+
+    {
+        "rhysd/vim-clang-format",
+        config = function()
+            vim.cmd [[
+                augroup clang_autoformat
+                    autocmd!
+                    autocmd FileType c,cpp ClangFormatAutoEnable
+                augroup END
+            ]]
+        end
+    },
+
+    { 'numToStr/Comment.nvim', opts = {} },
+
+    {
+        'nvim-telescope/telescope.nvim',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            {
+                'nvim-telescope/telescope-fzf-native.nvim',
+                build = 'make',
+                cond = function()
+                    return vim.fn.executable 'make' == 1
+                end,
+            },
+        },
+    },
+
+    {
+        'nvim-treesitter/nvim-treesitter',
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter-textobjects',
+        },
+        build = ':TSUpdate',
+    },
 }, {})
 
 vim.o.hlsearch = true;
@@ -120,10 +114,6 @@ vim.cmd.set 'expandtab'
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 require('telescope').setup {
   defaults = {
@@ -147,26 +137,8 @@ vim.keymap.set('n', '<leader>/', function()
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
-local function format_dart_buffer()
-    vim.api.nvim_command('write')  -- Save the current buffer
-    local current_file = vim.fn.expand('%:p')  -- Get the full path of the current file
-    local format_command = 'dart format ' .. current_file  -- Construct the Dart format command
-
-    -- Run the format command in a terminal
-    vim.fn.termopen(format_command)
-end
-
-local function format_dart()
-    local filename = vim.fn.expand("%:p")
-    if string.match(filename, "%.dart$") then
-        local dart_format_command = "dart format '" .. filename .. "'"
-        os.execute(dart_format_command)
-    end
-end
-
 require("conform").setup({
   formatters_by_ft = {
-    lua = { "stylua" },
     dart = { "dart_format" },
     rust = { "rustfmt" },
   },
@@ -175,20 +147,12 @@ require("conform").setup({
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function(args)
-    -- local filename = vim.fn.expand("%:p")
-    -- if string.match(filename, "%.dart$") then
         require("conform").format({ bufnr = args.buf })
-    -- end
   end,
 })
 
--- vim.keymap.set('n', '<leader>fd', require("conform").format({ bufnr = args.buf }), { desc = '[F]ormat [D]art code' })
-vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
@@ -236,11 +200,7 @@ require('mason-lspconfig').setup()
 
 local servers = {
     clangd = {},
-  -- gopls = {},
-  -- pyright = {},
     rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
   lua_ls = {
     Lua = {
@@ -320,44 +280,4 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
-
-local function git_branch()
-    local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
-    if string.len(branch) > 0 then
-        return branch
-    else
-        return ":"
-    end
-end
-
-local function statusline()
-    local set_color_1 = "%#PmenuSel#"
-    local branch = git_branch()
-    local set_color_2 = "%#LineNr#"
-    local file_name = " %f"
-    local modified = "%m"
-    local align_right = "%="
-    local fileencoding = " %{&fileencoding?&fileencoding:&encoding}"
-    local fileformat = " [%{&fileformat}]"
-    local filetype = " %y"
-    local percentage = " %p%%"
-    local linecol = " %l:%c"
-
-    return string.format(
-        "%s %s %s%s%s%s%s%s%s%s%s",
-        set_color_1,
-        branch,
-        set_color_2,
-        file_name,
-        modified,
-        align_right,
-        filetype,
-        fileencoding,
-        fileformat,
-        percentage,
-        linecol
-    )
-end
-
-vim.opt.statusline = statusline()
 
