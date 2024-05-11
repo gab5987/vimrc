@@ -14,13 +14,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup({
+local extensions = {
     'wakatime/vim-wakatime',
-
-    {
-        'dasupradyumna/midnight.nvim', lazy = false, priority = 1000,
-        config = function() vim.cmd.colorscheme 'midnight' end
-    },
 
     {
         'neovim/nvim-lspconfig',
@@ -34,28 +29,8 @@ require('lazy').setup({
 
     {
         'hrsh7th/nvim-cmp',
-        dependencies = {
-            'L3MON4D3/LuaSnip',
-            'saadparwaiz1/cmp_luasnip',
-            'hrsh7th/cmp-nvim-lsp',
-            'rafamadriz/friendly-snippets',
-        }
+        dependencies = { 'hrsh7th/cmp-nvim-lsp' }
     },
-
-    { 'stevearc/conform.nvim', opts = {} },
-
-    {
-        'akinsho/flutter-tools.nvim',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            'stevearc/dressing.nvim',
-        },
-        config = function()
-          require("flutter-tools").setup {}
-        end
-    },
-
-    { 'folke/which-key.nvim',  opts = {} },
 
     {
         "rhysd/vim-clang-format",
@@ -92,8 +67,11 @@ require('lazy').setup({
         },
         build = ':TSUpdate',
     },
-}, {})
+}
 
+require('lazy').setup(extensions, {})
+
+vim.cmd.colorscheme 'torte'
 vim.o.hlsearch = true;
 vim.wo.number = true
 vim.o.mouse = 'a'
@@ -106,7 +84,7 @@ vim.wo.signcolumn = 'yes'
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
-vim.o.termguicolors = true
+vim.o.termguicolors = false
 vim.cmd.set 'tabstop=2'
 vim.cmd.set 'shiftwidth=4'
 vim.cmd.set 'expandtab'
@@ -117,18 +95,11 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 require('telescope').setup {
   defaults = {
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-  },
+    mappings = { i = { ['<C-u>'] = false, ['<C-d>'] = false }}},
 }
 
 pcall(require('telescope').load_extension, 'fzf')
 
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -136,20 +107,6 @@ vim.keymap.set('n', '<leader>/', function()
     previewer = true,
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
-
-require("conform").setup({
-  formatters_by_ft = {
-    dart = { "dart_format" },
-    rust = { "rustfmt" },
-  },
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-        require("conform").format({ bufnr = args.buf })
-  end,
-})
 
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
@@ -160,15 +117,6 @@ vim.defer_fn(function()
     auto_install = false,
     highlight = { enable = true },
     indent = { enable = true },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<c-space>',
-        node_incremental = '<c-space>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<M-space>',
-      },
-    },
   }
 end, 0)
 
@@ -184,16 +132,7 @@ local on_attach = function(_, bufnr)
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 end
-
-require('which-key').register {
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-}
 
 require('mason').setup()
 require('mason-lspconfig').setup()
@@ -201,16 +140,7 @@ require('mason-lspconfig').setup()
 local servers = {
     clangd = {},
     rust_analyzer = {},
-
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
 }
-
-require('neodev').setup()
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
@@ -233,16 +163,8 @@ mason_lspconfig.setup_handlers {
 }
 
 local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
 
 cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
   completion = {
     completeopt = 'menu,menuone,noinsert'
   },
@@ -277,7 +199,6 @@ cmp.setup {
   },
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'luasnip' },
   },
 }
 
