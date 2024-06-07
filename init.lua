@@ -16,6 +16,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     'wakatime/vim-wakatime',
+    'oxfist/night-owl.nvim',
+    'olimorris/onedarkpro.nvim',
 
     {
         'neovim/nvim-lspconfig',
@@ -89,7 +91,18 @@ require('lazy').setup({
     },
 }, {})
 
-vim.cmd.colorscheme 'torte'
+-- local night_owl = require("night-owl")
+--
+-- night_owl.setup({
+--     bold = true,
+--     italics = true,
+--     underline = true,
+--     undercurl = true,
+--     transparent_background = true,
+-- })
+
+vim.cmd.colorscheme 'onedark_dark'
+
 vim.o.hlsearch = true;
 vim.wo.number = true
 vim.o.mouse = 'a'
@@ -110,6 +123,9 @@ vim.cmd.set 'expandtab'
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 require('telescope').setup {
   defaults = {
