@@ -16,8 +16,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     'wakatime/vim-wakatime',
-    'oxfist/night-owl.nvim',
-    'olimorris/onedarkpro.nvim',
+    'Mofiqul/vscode.nvim',
 
     {
         'neovim/nvim-lspconfig',
@@ -91,18 +90,14 @@ require('lazy').setup({
     },
 }, {})
 
--- local night_owl = require("night-owl")
---
--- night_owl.setup({
---     bold = true,
---     italics = true,
---     underline = true,
---     undercurl = true,
---     transparent_background = true,
--- })
+require('vscode').setup({
+    transparent = true,
+    italic_comments = true,
+    underline_links = true,
+})
 
-vim.cmd.colorscheme 'onedark_dark'
-
+vim.cmd.colorscheme "vscode"
+vim.wo.relativenumber = true
 vim.o.hlsearch = true;
 vim.wo.number = true
 vim.o.mouse = 'a'
