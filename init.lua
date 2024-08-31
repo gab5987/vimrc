@@ -38,21 +38,6 @@ require('lazy').setup({
         }
     },
 
-    { 'stevearc/conform.nvim', opts = {} },
-
-    {
-        'akinsho/flutter-tools.nvim',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            'stevearc/dressing.nvim',
-        },
-        config = function()
-          require("flutter-tools").setup {}
-        end
-    },
-
-    { 'folke/which-key.nvim',  opts = {} },
-
     {
         "rhysd/vim-clang-format",
         config = function()
@@ -79,14 +64,6 @@ require('lazy').setup({
                 end,
             },
         },
-    },
-
-    {
-        'nvim-treesitter/nvim-treesitter',
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter-textobjects',
-        },
-        build = ':TSUpdate',
     },
 }, {})
 
@@ -116,9 +93,6 @@ vim.cmd.set 'shiftwidth=4'
 vim.cmd.set 'expandtab'
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
@@ -133,8 +107,6 @@ require('telescope').setup {
   },
 }
 
-pcall(require('telescope').load_extension, 'fzf')
-
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
@@ -144,40 +116,8 @@ vim.keymap.set('n', '<leader>/', function()
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
-require("conform").setup({
-  formatters_by_ft = {
-    dart = { "dart_format" },
-    rust = { "rustfmt" },
-  },
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-        require("conform").format({ bufnr = args.buf })
-  end,
-})
 
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-
-vim.defer_fn(function()
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash' },
-    auto_install = false,
-    highlight = { enable = true },
-    indent = { enable = true },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<c-space>',
-        node_incremental = '<c-space>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<M-space>',
-      },
-    },
-  }
-end, 0)
 
 local on_attach = function(_, bufnr)
   local nmap = function(keys, func, desc)
@@ -196,11 +136,6 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 end
-
-require('which-key').register {
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-}
 
 require('mason').setup()
 require('mason-lspconfig').setup()
