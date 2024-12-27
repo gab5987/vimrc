@@ -16,7 +16,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     'wakatime/vim-wakatime',
-    'Mofiqul/vscode.nvim',
+    -- 'Mofiqul/vscode.nvim',
 
     {
         'neovim/nvim-lspconfig',
@@ -67,14 +67,14 @@ require('lazy').setup({
     },
 }, {})
 
-require('vscode').setup({
-    transparent = true,
-    italic_comments = true,
-    underline_links = true,
-})
+-- require('vscode').setup({
+--     transparent = true,
+--     italic_comments = true,
+--     underline_links = true,
+-- })
 
-vim.cmd.colorscheme "vscode"
-vim.wo.relativenumber = true
+vim.cmd.colorscheme "retrobox"
+vim.wo.relativenumber = false
 vim.o.hlsearch = true;
 vim.wo.number = true
 vim.o.mouse = 'a'
